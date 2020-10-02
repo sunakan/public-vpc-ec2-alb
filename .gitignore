@@ -831,3 +831,4 @@ go-pkg
 .config
 __debug_bin
 rq
+*.secret

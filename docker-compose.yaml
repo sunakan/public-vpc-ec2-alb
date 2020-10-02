@@ -1,0 +1,13 @@
+---
+version: '3.8'
+
+services:
+  cdk:
+    image: my-aws-cli-cdk
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ~/.aws/
+        target: /root/.aws/

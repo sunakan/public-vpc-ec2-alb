@@ -1,7 +1,7 @@
 ################################################################################
 # 変数
 ################################################################################
-CFN_STACK_NAME := stack-02-vpc-only
+CFN_STACK_NAME := $(shell basename $(PWD))
 
 ################################################################################
 # タスク
@@ -9,6 +9,10 @@ CFN_STACK_NAME := stack-02-vpc-only
 .PHONY: create-stack
 create-stack: ## 適用
 	aws cloudformation create-stack --stack-name $(CFN_STACK_NAME) --template-body file://./main.yaml
+
+.PHONY: update
+update:
+	aws cloudformation update-stack --stack-name $(CFN_STACK_NAME) --template-body file://./main.yaml
 
 .PHONY: delete-stack
 delete-stack: ## 削除

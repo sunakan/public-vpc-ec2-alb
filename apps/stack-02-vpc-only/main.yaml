@@ -1,12 +1,29 @@
----
 AWSTemplateFormatVersion: "2010-09-09"
-
 Resources:
-  SecondVPC:
+  VPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: second-vpc
-...
+          Value: test-vpc
+  VPCSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.0.0/20
+      Tags:
+      - Key: Name
+        Value: test-subnet-a
+      VpcId: !Ref VPC
+  VPCSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.16.0/20
+      Tags:
+        - Key: Name
+          Value: test-subnet-c
+      VpcId: !Ref VPC

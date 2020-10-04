@@ -61,7 +61,7 @@ update-stack: ## 適用
 
 .PHONY: revoke-default-security-group-rules
 revoke-default-security-group-rules:
-	$(eval DEFAULT_SECURITY_GROUP_ID := $(shell aws cloudformation describe-stacks --stack-name "stack-05-vpc" | jq '.Stacks[].Outputs' | jq --raw-output '.[] | select(.OutputKey == "DefaultSecurityGroupId").OutputValue'))
+	$(eval DEFAULT_SECURITY_GROUP_ID := $(shell aws cloudformation describe-stacks --stack-name '$(CFN_STACK_NAME)' | jq '.Stacks[].Outputs' | jq --raw-output '.[] | select(.OutputKey == "DefaultSecurityGroupId").OutputValue'))
 	$(eval IP_PERMISSIONS := $(shell aws ec2 describe-security-groups --group-ids $(DEFAULT_SECURITY_GROUP_ID) | jq --raw-output --compact-output '.SecurityGroups[].IpPermissions'))
 	if [ '$(IP_PERMISSIONS)' != '[]' ]; then \
 		aws ec2 revoke-security-group-ingress --group-id $(DEFAULT_SECURITY_GROUP_ID) --ip-permissions '$(IP_PERMISSIONS)'; \

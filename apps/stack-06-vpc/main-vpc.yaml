@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "VPC only"
+##############################################################################
+# パラメータ
+##############################################################################
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prd
+      - stg
+    Description: Enter the environment. (prd/dev/stg)
+
+##############################################################################
+# リソース
+##############################################################################
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-vpc", !Ref Env ] ]
+
+##############################################################################
+# Output
+##############################################################################
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export:
+      Name: GlobalBasicVpcId
+  DefaultSecurityGroupId:
+    Value: !GetAtt VPC.DefaultSecurityGroup

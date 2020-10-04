@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "3 intra subnets"
+
+##############################################################################
+# パラメータ
+##############################################################################
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prd
+      - stg
+    Description: Enter the environment. (prd/dev/stg)
+
+##############################################################################
+# リソース
+##############################################################################
+Resources:
+  ##############################################################################
+  # VPC Subnet(Intra)
+  ##############################################################################
+  VPCSubnetIntraA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.48.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-intra-subnet-a", !Ref Env ] ]
+      VpcId: !Sub "{{resolve:ssm:/cfn/global/vpc/${Env}/vpc-id:1}}"
+  VPCSubnetIntraC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.64.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-intra-subnet-c", !Ref Env ] ]
+      VpcId: !Sub "{{resolve:ssm:/cfn/global/vpc/${Env}/vpc-id:1}}"
+  VPCSubnetIntraD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: 10.0.80.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-intra-subnet-d", !Ref Env ] ]
+      VpcId: !Sub "{{resolve:ssm:/cfn/global/vpc/${Env}/vpc-id:1}}"
+  ##############################################################################
+  # Route table(For Intra)
+  ##############################################################################
+  IntraRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Sub "{{resolve:ssm:/cfn/global/vpc/${Env}/vpc-id:1}}"
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-intra-rt", !Ref Env ] ]
+  IntraRouteTableAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref IntraRouteTable
+      SubnetId: !Ref VPCSubnetIntraA
+  IntraRouteTableAssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref IntraRouteTable
+      SubnetId: !Ref VPCSubnetIntraC
+  IntraRouteTableAssociationD:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref IntraRouteTable
+      SubnetId: !Ref VPCSubnetIntraD

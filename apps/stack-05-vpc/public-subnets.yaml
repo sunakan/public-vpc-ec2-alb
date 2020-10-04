@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "3 public subnets"
+
+##############################################################################
+# パラメータ
+##############################################################################
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prd
+      - stg
+    Description: Enter the environment. (prd/dev/stg)
+  VpcId:
+    Description: VPC ID
+    Type: String
+    AllowedPattern: "vpc-([a-zA-Z0-9])+"
+
+##############################################################################
+# リソース
+##############################################################################
+Resources:
+  VPCSubnetPubA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.0.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-pub-subnet-a", !Ref Env ] ]
+      VpcId: !Ref VpcId
+  VPCSubnetPubC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.16.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-pub-subnet-c", !Ref Env ] ]
+      VpcId: !Ref VpcId
+  VPCSubnetPubD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-northeast-1d
+      CidrBlock: 10.0.32.0/20
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-pub-subnet-d", !Ref Env ] ]
+      VpcId: !Ref VpcId
+  ##############################################################################
+  # Internet Gateway
+  ##############################################################################
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-igw", !Ref Env ] ]
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref IGW
+      VpcId: !Ref VpcId
+  ##############################################################################
+  # Route Table(For Public)
+  ##############################################################################
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ "test-rt", !Ref Env ] ]
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref PublicRouteTable
+  PublicRouteTableAssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref VPCSubnetPubA
+  PublicRouteTableAssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref VPCSubnetPubC
+  PublicRouteTableAssociationD:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref VPCSubnetPubD
